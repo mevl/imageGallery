@@ -8,12 +8,10 @@
      * @param {HtmlElement} element The thumbnails container element.
      * @param {object} options The options object.
      */
-    constructor( {element, options = {}} ) {
+    constructor({ element, options = {} }) {
       const defaultOptions = {
-        largeSuffix: '-lg',
-        thumbSuffix: '-thumb',
-        imagesSelector: 'a img',
         galleryElementSelector: '#largeImg',
+        imagesSelector: 'a img',
         preload: true,
         transitionTime: 200,
       };
@@ -39,9 +37,12 @@
      */
     preload() {
       const preloadEl = document.createElement('div');
-      preloadEl.style.visibility = 'hidden';
-      Array.prototype.forEach.call(this.images, (image) => {
-        preloadEl.appendChild(this.getLargeImage(image));
+      let largeImage;
+      preloadEl.style.display = 'none';
+      Array.prototype.forEach.call(this.images, (thumbImage) => {
+        largeImage = document.createElement('img');
+        largeImage.src = this.getLargeImageSrc(thumbImage);
+        preloadEl.appendChild(largeImage);
       });
       document.body.appendChild(preloadEl);
     }
@@ -53,9 +54,7 @@
      * @returns {string} The large image URI (can be used for source attribute).
      */
     getLargeImageSrc(thumbImage) {
-      return thumbImage.src.indexOf(this.options.thumbSuffix)
-        ? thumbImage.src.replace(new RegExp(this.options.thumbSuffix), this.options.largeSuffix)
-        : thumbImage.src;
+      return thumbImage.parentElement.href;
     }
 
     /**
@@ -66,18 +65,6 @@
      */
     getLargeImageAlt(thumbImage) {
       return thumbImage.parentElement.title;
-    }
-
-    /**
-     * Get the large image element by the thumbnail element.
-     *
-     * @param {HtmlElement} thumbImage The sourse thumbnail image element.
-     * @returns {HtmlElement} The large image Html element.
-     */
-    getLargeImage(thumbImage) {
-      const img = document.createElement('img');
-      img.setAttribute('src', this.getLargeImageSrc(thumbImage));
-      return img;
     }
 
     /**
